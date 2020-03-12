@@ -6,10 +6,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using seed2.BLL.Interface;
+using seed2.BLL.Service;
+using seed2.DAL;
+using seed2.DAL.Interface;
+using seed2.DAL.Repository;
+using seed2.DAL.Transaction;
 
 namespace seed2
 {
@@ -25,7 +32,14 @@ namespace seed2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<seed2Context>(_ => _.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddScoped<IUnidadeService, UnidadeService>();
+            services.AddScoped<IUnidadeRepository, UnidadeRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,7 +55,7 @@ namespace seed2
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
